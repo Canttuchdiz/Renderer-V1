@@ -1,5 +1,7 @@
+#include <iostream>
 #include "renderer.h"
 #include "color.h"
+#include "sphere.h"
 
 Renderer::Renderer(int image_width, int image_height, double fov, Camera &camera) : image_width_{image_width},
                                                                                     image_height_{image_height},
@@ -17,10 +19,20 @@ void Renderer::render(std::ostream& out, const Scene& scene) const {
             
             Point3 pixel_position = camera_.pixel_position(i, j);
             Vector3 ray_direction = (pixel_position - camera_.position()).normalized();
+            double last_depth = -1;
 
             for (const Sphere& sphere : scene.spheres()) {
-                
-                if (sphere.hits_sphere(camera_.position(), ray_direction)) b = 1;
+                std::optional<Hit> hit = sphere.hits_sphere(camera_.position(), ray_direction);
+
+                if (hit && (hit->t < last_depth || last_depth == -1)) {
+
+                    // Pixel color calculation
+                    r = (hit->normal.x() + 1)/2;
+                    g = (hit->normal.y() + 1)/2;
+                    b = (hit->normal.z() + 1)/2;
+
+                    last_depth = hit->t;
+                }
             }
 
             Color pixel_color = Color(r, g, b);
