@@ -8,13 +8,9 @@
 
 int main() {
 
-    // Image
-
     int image_width = 800;
     int image_height = 450;
     double fov = 90;
-
-    // Render
 
     std::ofstream output("image.ppm");
 
@@ -22,13 +18,13 @@ int main() {
 
     Scene scene = Scene();
 
-    Sphere sphere(Vector3(-10, 5, 40), 5);
+    Sphere sphere(Vector3(-15, 5, 40), 5);
     Sphere sphere2(Vector3(15, -5, 40), 10);
 
     scene.add_sphere(sphere);
     scene.add_sphere(sphere2);
 
-    Renderer renderer = Renderer(image_width, image_height, fov, camera);
+    Renderer renderer = Renderer(image_width, image_height, camera);
 
     renderer.render(output, scene);
 }
