@@ -1,31 +1,30 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "vec3.h"
 #include <optional>
+#include "vec3.h"
+#include "ray.h"
+#include "object.h"
 
-struct Hit {
-    Point3 position;
-    Vector3 normal;
-    double t;
-};
-
-class Sphere {
+class Sphere : public Object {
 private:
     Point3 center_;
     double radius_;
+    Color color_;
 
     double min_root(double a, double b, double c) const;
 
 public:
 
     Sphere();
-    Sphere(Point3 center, double radius);
+    Sphere(Point3 center, double radius, Color color);
 
     Point3 center() const;
     double radius() const;
     
-    std::optional<Hit> hits_sphere(const Point3& origin, const Vector3& direction) const;
+    std::optional<Hit> intersect(const Ray& ray) const override;
+
+    Color color() const override { return color_; }
 
 };
 

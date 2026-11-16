@@ -3,6 +3,12 @@
 
 #include "vec3.h"
 
+struct Hit {
+    Point3 position;
+    Vector3 normal;
+    double t;
+};
+
 class Ray {
 private:
     Point3 origin_;

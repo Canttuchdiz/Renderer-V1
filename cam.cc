@@ -1,12 +1,11 @@
 #include <random>
 #include "vec3.h"
 #include "cam.h"
+#include "constants.h"
 
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_real_distribution<double> dis(0.0, 1.0);
-
-const double pi = std::acos(-1.0);
+std::random_device rd_cam;
+std::mt19937 gen_cam(rd_cam());
+std::uniform_real_distribution<double> dis_cam(0.0, 1.0);
 
 double degrees_to_radians(double degrees) { return degrees * (pi / 180.0); }
 
@@ -33,7 +32,7 @@ Point3 Camera::pixel_center(int x, int y) const {
 }
 
 Point3 Camera::pixel_random(int x, int y) const {
-    Point3 pixel_x = plane_origin() + (right_ * (x + dis(gen)));
-    Point3 pixel_pos = pixel_x - (up_ * (y + dis(gen)));
+    Point3 pixel_x = plane_origin() + (right_ * (x + dis_cam(gen_cam)));
+    Point3 pixel_pos = pixel_x - (up_ * (y + dis_cam(gen_cam)));
     return pixel_pos;
 }

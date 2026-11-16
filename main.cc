@@ -5,26 +5,28 @@
 #include "cam.h"
 #include "sphere.h"
 #include "renderer.h"
+#include "plane.h"
 
 int main() {
 
-    int image_width = 800;
-    int image_height = 450;
+    int image_width = 1280;
+    int image_height = 720;
     double fov = 90;
 
     std::ofstream output("image.ppm");
 
-    Camera camera = Camera(image_width, double(image_width)/image_height, fov, Vector3::zero());
+    Camera camera = Camera(image_width, double(image_width)/image_height, fov, Vector3(0, 10, -5));
 
     Scene scene = Scene();
 
-    Sphere sphere(Vector3(-15, 5, 40), 5);
-    Sphere sphere2(Vector3(15, -5, 40), 10);
+    Sphere sphere(Vector3(-20, 8, 55), 8, Color(0.3, 0.1, 0.7));
+    Sphere sphere2(Vector3(13, 13, 40), 13, Color(0.9, 0.1, 0.1));
 
-    scene.add_sphere(sphere);
-    scene.add_sphere(sphere2);
+    scene.add_object(std::make_unique<Sphere>(sphere));
+    scene.add_object(std::make_unique<Sphere>(sphere2));
+    scene.add_object(std::make_unique<Plane>(0, Color(0.6, 0.6, 0.6)));
 
-    Renderer renderer = Renderer(image_width, image_height, camera);
+    Renderer renderer = Renderer(image_width, image_height, camera, 2048);
 
     renderer.render(output, scene);
 }

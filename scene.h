@@ -2,18 +2,20 @@
 #define SCENE_H
 
 #include <vector>
-#include "sphere.h"
+#include <memory>
+#include <utility>
+#include "object.h"
 
 class Scene {
 private:
-    std::vector<Sphere> spheres_;
+    std::vector<std::unique_ptr<Object>> objects_;
 
 public:
-    void add_sphere(const Sphere& sphere) {
-        spheres_.push_back(sphere);
+    void add_object(std::unique_ptr<Object> object) {
+        objects_.push_back(std::move(object));
     }
 
-    const std::vector<Sphere>& spheres() const { return spheres_; }
+    const std::vector<std::unique_ptr<Object>>& objects() const { return objects_; }
 };
 
 #endif

@@ -1,9 +1,9 @@
-#include "sphere.h"
 #include <algorithm>
+#include "sphere.h"
 
 Sphere::Sphere() : center_{Vector3::zero()}, radius_{1} {}
 
-Sphere::Sphere(Point3 center, double radius) : center_{center}, radius_{radius} {}
+Sphere::Sphere(Point3 center, double radius, Color color) : center_{center}, radius_{radius}, color_{color} {}
 
 Point3 Sphere::center() const { return center_; }
 double Sphere::radius() const { return radius_; }
@@ -24,7 +24,10 @@ double Sphere::min_root(double a, double b, double c) const {
     return min;
 }
 
-std::optional<Hit> Sphere::hits_sphere(const Point3& origin, const Vector3& direction) const {
+std::optional<Hit> Sphere::intersect(const Ray& ray) const {
+    Point3 origin = ray.origin();
+    Vector3 direction = ray.direction();
+
     double a = 1;
     double b = 2 * direction.dot(origin - center_);
     double c = origin.length_squared() + center_.length_squared() - (radius_ * radius_) - (2 * (origin.dot(center_)));
@@ -33,7 +36,7 @@ std::optional<Hit> Sphere::hits_sphere(const Point3& origin, const Vector3& dire
 
     if (t >= 0) {
         Point3 hit_position = origin + (direction * t);
-        Vector3 hit_normal = (hit_position - center_).normalized();
+        Vector3 hit_normal = (hit_position - center_).normalize();
         return Hit {hit_position, hit_normal, t};
     }
     return std::nullopt;
