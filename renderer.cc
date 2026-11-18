@@ -3,7 +3,7 @@
 #include "color.h"
 #include "sphere.h"
 
-Renderer::Renderer(int image_width, int image_height, Camera &camera, int ray_count) : image_width_{image_width}, image_height_{image_height}, camera_{camera}, ray_count_{ray_count} {}
+Renderer::Renderer(int image_width, int image_height, Camera &camera, const LightSource& source, int ray_count) : image_width_{image_width}, image_height_{image_height}, camera_{camera}, source_{source}, ray_count_{ray_count} {}
 
 Color Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 {
@@ -11,7 +11,7 @@ Color Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 
     if (bounces <= 0) return Color(0, 0, 0);
 
-    Color hit_color;
+    Color hit_reflectance;
 
     for (const auto& object : scene.objects())
     {
@@ -19,19 +19,20 @@ Color Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 
         if (hit && (!last_hit || hit->t < last_hit->t)) {
             last_hit = hit;
-            hit_color = object->color(hit->position);
+            hit_reflectance = object->color(hit->position);
         }
     }
 
     if (last_hit) {
         Vector3 ray_position = ray.origin() + (ray.direction() * last_hit->t);
         Vector3 random_direction = Vector3::random_hemisphere_direction();
-        Vector3 world_random_direction = Vector3::local_to_world_matrix(last_hit->normal) * random_direction;
+        Vector3 world_random_direction = (Vector3::local_to_world_matrix(last_hit->normal) * random_direction).normalize();
 
-        return hit_color * trace_ray(Ray(ray_position + (world_random_direction * 0.0001), world_random_direction), scene, bounces - 1) * 0.8;
+        return 2 * hit_reflectance * trace_ray(Ray(ray_position + (last_hit->normal * 0.0001), world_random_direction), scene, bounces - 1) * std::max(0.0, world_random_direction.dot(last_hit->normal));
     }
+    if (ray.direction().dot(source_.direction()) >= std::cos(source_.angular_radius())) { return source_.radiance(); }
 
-    return Color(1.0, 1.0, 1.0);
+    return Color(0, 0, 0);
 }
 
 void Renderer::render(std::ostream &out, const Scene &scene) const
@@ -63,8 +64,10 @@ void Renderer::render(std::ostream &out, const Scene &scene) const
             for (const Color &pixel_color : hit_colors)
                 pixel_sum += pixel_color;
 
-            Color pixel_average = pixel_sum / hit_colors.size() * 0.7;
-            Color pixel_root_average = Color(std::sqrt(pixel_average.x()), std::sqrt(pixel_average.y()), std::sqrt(pixel_average.z()));
+            Color pixel_average = pixel_sum / hit_colors.size();
+            Color exposed = pixel_average * .0028;
+            Color mapped_pixel_average = Vector3(exposed.x() / (exposed.x() + 1), exposed.y() / (exposed.y() + 1), exposed.z() / (exposed.z() + 1));
+            Color pixel_root_average = Color(std::sqrt(mapped_pixel_average.x()), std::sqrt(mapped_pixel_average.y()), std::sqrt(mapped_pixel_average.z()));
             write_color(out, pixel_root_average);
 
             int percent = int((double(i + 1 + (j * image_width_))/(image_width_ * image_height_)) * 100);

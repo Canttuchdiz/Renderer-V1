@@ -4,17 +4,19 @@
 #include "cam.h"
 #include "scene.h"
 #include "ray.h"
+#include "lightSource.h"
 
 class Renderer {
 private:
     int image_width_;
     int image_height_;
     Camera camera_;
+    LightSource source_;
     int ray_count_;
 
 public:
 
-    Renderer(int image_width, int image_height, Camera& camera, int ray_count);
+    Renderer(int image_width, int image_height, Camera& camera, const LightSource& source, int ray_count);
 
     Color trace_ray(Ray ray, const Scene& scene, int bounces) const;
 

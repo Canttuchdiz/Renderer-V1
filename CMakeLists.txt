@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(RayTracer LANGUAGES CXX)
 
-add_executable(raytracer main.cc cam.cc sphere.cc renderer.cc)
+add_executable(raytracer main.cc cam.cc sphere.cc renderer.cc lightSource.cc)
 
 set_target_properties(raytracer PROPERTIES
     CXX_STANDARD 17
