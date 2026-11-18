@@ -1,9 +1,7 @@
 #include <algorithm>
 #include "sphere.h"
 
-Sphere::Sphere() : center_{Vector3::zero()}, radius_{1} {}
-
-Sphere::Sphere(Point3 center, double radius, Color color) : center_{center}, radius_{radius}, color_{color} {}
+Sphere::Sphere(Point3 center, double radius, Color color, const Material& material) : center_{center}, radius_{radius}, color_{color}, Object(material) {}
 
 Point3 Sphere::center() const { return center_; }
 double Sphere::radius() const { return radius_; }

@@ -6,16 +6,19 @@
 #include "sphere.h"
 #include "renderer.h"
 #include "plane.h"
+#include "lightSource.h"
 
 int main() {
-
+    // 1280 720 | 850 478
     int image_width = 1280;
     int image_height = 720;
-    double fov = 90;
+    double fov = 100;
 
     std::ofstream output("image.ppm");
 
-    Camera camera = Camera(image_width, double(image_width)/image_height, fov, Vector3(0, 10, -5));
+    Camera camera = Camera(image_width, double(image_width)/image_height, fov, Vector3(0, 10, 0));
+
+    LightSource source = LightSource(Vector3(0, 1, 0), 0.27 * (pi/180), Irradiance(1361, 1361, 1361));
 
     Scene scene = Scene();
 
@@ -24,9 +27,9 @@ int main() {
 
     scene.add_object(std::make_unique<Sphere>(sphere));
     scene.add_object(std::make_unique<Sphere>(sphere2));
-    scene.add_object(std::make_unique<Plane>(0, Color(0.6, 0.6, 0.6)));
+    scene.add_object(std::make_unique<Plane>(0, Color(0.3, 0.3, 0.3)));
 
-    Renderer renderer = Renderer(image_width, image_height, camera, 2048);
+    Renderer renderer = Renderer(image_width, image_height, camera, 2048); // 64 | 2048
 
     renderer.render(output, scene);
 }

@@ -215,6 +215,10 @@ inline Vector3 Matrix3::operator*(const Vector3 &v) const
 using Point3 = Vector3;
 using Color = Vector3;
 
+using Irradiance = Vector3;
+using Radiance = Vector3;
+
+
 inline Vector3 operator*(double scalar, const Vector3 &v)
 {
     return v * scalar;

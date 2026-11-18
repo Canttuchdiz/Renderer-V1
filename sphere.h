@@ -16,15 +16,14 @@ private:
 
 public:
 
-    Sphere();
-    Sphere(Point3 center, double radius, Color color);
+    Sphere(Point3 center, double radius, Color color, const Material& material);
 
     Point3 center() const;
     double radius() const;
     
     std::optional<Hit> intersect(const Ray& ray) const override;
 
-    Color color() const override { return color_; }
+    Color color(const std::any&) const override { return color_; }
 
 };
 

@@ -19,7 +19,7 @@ Color Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 
         if (hit && (!last_hit || hit->t < last_hit->t)) {
             last_hit = hit;
-            hit_color = object->color();
+            hit_color = object->color(hit->position);
         }
     }
 
