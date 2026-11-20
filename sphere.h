@@ -2,6 +2,7 @@
 #define SPHERE_H
 
 #include <optional>
+#include <memory>
 #include "vec3.h"
 #include "ray.h"
 #include "object.h"
@@ -16,7 +17,7 @@ private:
 
 public:
 
-    Sphere(Point3 center, double radius, Color color, const Material& material);
+    Sphere(Point3 center, double radius, std::shared_ptr<const Material> material);
 
     Point3 center() const;
     double radius() const;

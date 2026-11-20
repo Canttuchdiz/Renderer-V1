@@ -1,9 +1,10 @@
 #ifndef PLANE_H
 #define PLANE_H
 
+#include <optional>
+#include <memory>
 #include "ray.h"
 #include "object.h"
-#include <optional>
 
 class Plane : public Object {
 private:
@@ -12,7 +13,7 @@ private:
 
 public:
 
-    Plane(double level, Color color, const Material& material) : level_{level}, color_{color}, Object(material) {}
+    Plane(double level, std::shared_ptr<const Material> material) : level_{level}, Object(std::move(material)) {}
 
     double level() const { return level_; }
 
@@ -28,7 +29,7 @@ public:
         if (t > 0) {
             Point3 hit_position = position + (direction * t);
             Vector3 hit_normal = Vector3(0, 1, 0);
-            return Hit {hit_position, hit_normal, t};
+            return Hit {hit_position, hit_normal, t, material_.get()};
         }
         return std::nullopt;
     }

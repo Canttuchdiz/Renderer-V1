@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "sphere.h"
 
-Sphere::Sphere(Point3 center, double radius, Color color, const Material& material) : center_{center}, radius_{radius}, color_{color}, Object(material) {}
+Sphere::Sphere(Point3 center, double radius, std::shared_ptr<const Material> material) : center_{center}, radius_{radius}, Object(std::move(material)) {}
 
 Point3 Sphere::center() const { return center_; }
 double Sphere::radius() const { return radius_; }
@@ -35,7 +35,7 @@ std::optional<Hit> Sphere::intersect(const Ray& ray) const {
     if (t >= 0) {
         Point3 hit_position = origin + (direction * t);
         Vector3 hit_normal = (hit_position - center_).normalize();
-        return Hit {hit_position, hit_normal, t};
+        return Hit {hit_position, hit_normal, t, material_.get()};
     }
     return std::nullopt;
 }

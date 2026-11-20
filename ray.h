@@ -2,11 +2,13 @@
 #define RAY_H
 
 #include "vec3.h"
+#include "material.h"
 
 struct Hit {
     Point3 position;
     Vector3 normal;
     double t;
+    const Material* material;
 };
 
 class Ray {

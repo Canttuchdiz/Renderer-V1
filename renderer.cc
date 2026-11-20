@@ -5,34 +5,52 @@
 
 Renderer::Renderer(int image_width, int image_height, Camera &camera, const LightSource& source, int ray_count) : image_width_{image_width}, image_height_{image_height}, camera_{camera}, source_{source}, ray_count_{ray_count} {}
 
-Color Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
-{
+std::optional<Hit> Renderer::ray_intersect(Ray ray, const Scene& scene) const {
     std::optional<Hit> last_hit;
-
-    if (bounces <= 0) return Color(0, 0, 0);
-
-    Color hit_reflectance;
 
     for (const auto& object : scene.objects())
     {
         std::optional<Hit> hit = object->intersect(ray);
 
         if (hit && (!last_hit || hit->t < last_hit->t)) {
-            last_hit = hit;
-            hit_reflectance = object->color(hit->position);
+            last_hit = std::move(hit);
         }
     }
+    return last_hit;
+}
+
+Vector3 Renderer::trace_ray(Ray ray, const Scene& scene, int bounces) const
+{
+
+    if (bounces <= 0) return Color(0, 0, 0);
+
+    Radiance radiance = Vector3::zero();
+
+    std::optional<Hit> last_hit = ray_intersect(ray, scene);
 
     if (last_hit) {
         Vector3 ray_position = ray.origin() + (ray.direction() * last_hit->t);
         Vector3 random_direction = Vector3::random_hemisphere_direction();
         Vector3 world_random_direction = (Vector3::local_to_world_matrix(last_hit->normal) * random_direction).normalize();
+        Color hit_reflectance = last_hit->material->texture(last_hit->position);
 
-        return 2 * hit_reflectance * trace_ray(Ray(ray_position + (last_hit->normal * 0.0001), world_random_direction), scene, bounces - 1) * std::max(0.0, world_random_direction.dot(last_hit->normal));
+
+        Ray sun_ray = Ray(last_hit->position + (last_hit->normal * 0.0001), source_.direction());
+        if(!(ray_intersect(sun_ray, scene))) {
+            double sin_alpha = std::sin(source_.angular_radius());
+            double sun_angle = std::max(0.0, last_hit->normal.dot(sun_ray.direction()));
+
+            // Direct lighting
+            radiance += hit_reflectance * source_.radiance() * (sin_alpha * sin_alpha) * std::max(0.0, last_hit->normal.normalize().dot(sun_ray.direction()));
+        }
+
+        // Indirect lighting
+        radiance += 2 * hit_reflectance * trace_ray(Ray(ray_position + (last_hit->normal * 0.0001), world_random_direction), scene, bounces - 1) * std::max(0.0, world_random_direction.dot(last_hit->normal));
+
+        return radiance;
     }
-    if (ray.direction().dot(source_.direction()) >= std::cos(source_.angular_radius())) { return source_.radiance(); }
 
-    return Color(0, 0, 0);
+    return Vector3::zero();
 }
 
 void Renderer::render(std::ostream &out, const Scene &scene) const

@@ -1,6 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+#include <iostream>
 #include <random>
 #include <stdexcept>
 #include <cmath>
@@ -12,6 +13,8 @@ inline std::mt19937 gen(rd());
 inline std::uniform_real_distribution<double> dis(0.0, 1.0);
 
 class Vector3;
+
+inline std::ostream &operator<<(std::ostream &out, const Vector3 &v);
 
 struct Matrix3
 {
@@ -183,11 +186,37 @@ public:
         return world_to_local_matrix(normal).transpose();
     }
 
+    static Matrix3 rotation_x_matrix(double theta) {
+        return Matrix3{{
+            {1, 0, 0},
+            {0, std::cos(theta), std::sin(theta)},
+            {0, -std::sin(theta), std::cos(theta)}
+        }};
+    }
+
     static Matrix3 rotation_y_matrix(double theta)
     {
         return Matrix3{{{std::cos(theta), 0, -std::sin(theta)},
                         {0, 1, 0},
                         {std::sin(theta), 0, std::cos(theta)}}};
+    }
+
+    static Matrix3 rotation_z_matrix(double theta) {
+        return Matrix3{{
+            {std::cos(theta), std::sin(theta), 0},
+            {-std::sin(theta), std::cos(theta), 0},
+            {0, 0, 1}
+        }};
+    }
+
+    static Vector3 random_angular_direction(double theta) {
+        double y = 1 - (dis(gen) * (1 - std::cos(theta)));
+        double z = std::sqrt(1 - (y * y));
+
+        Vector3 initial_vector = Vector3(0, y, z);
+        Matrix3 rotation_matrix = rotation_y_matrix(dis(gen) * 2 * pi);
+        Vector3 rotated_vector = rotation_matrix * initial_vector;
+        return rotated_vector;
     }
 
     static Vector3 random_hemisphere_direction()
