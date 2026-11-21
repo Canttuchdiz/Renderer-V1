@@ -30,18 +30,24 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene& scene, int bounces) const
 
     if (last_hit) {
         Vector3 ray_position = ray.origin() + (ray.direction() * last_hit->t);
+
         Vector3 random_direction = Vector3::random_hemisphere_direction();
         Vector3 world_random_direction = (Vector3::local_to_world_matrix(last_hit->normal) * random_direction).normalize();
+
+        Matrix3 local_to_world_matrix = Vector3::local_to_world_matrix(source_.direction().normalize());
+        Vector3 local_random_vector = Vector3::random_angular_direction(source_.angular_radius());
+        Vector3 random_angular_direction = (local_to_world_matrix * local_random_vector).normalize();
+
         Color hit_reflectance = last_hit->material->texture(last_hit->position);
 
 
-        Ray sun_ray = Ray(last_hit->position + (last_hit->normal * 0.0001), source_.direction());
+        Ray sun_ray = Ray(last_hit->position + (last_hit->normal * 0.0001), random_angular_direction);
         if(!(ray_intersect(sun_ray, scene))) {
-            double sin_alpha = std::sin(source_.angular_radius());
-            double sun_angle = std::max(0.0, last_hit->normal.dot(sun_ray.direction()));
 
             // Direct lighting
-            radiance += hit_reflectance * source_.radiance() * (sin_alpha * sin_alpha) * std::max(0.0, last_hit->normal.normalize().dot(sun_ray.direction()));
+            radiance += 2 * hit_reflectance * source_.radiance() * (1 - std::cos(source_.angular_radius())) * std::max(0.0, last_hit->normal.normalize().dot(sun_ray.direction()));
+            
+        
         }
 
         // Indirect lighting

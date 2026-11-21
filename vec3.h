@@ -209,6 +209,7 @@ public:
         }};
     }
 
+    // From center direction
     static Vector3 random_angular_direction(double theta) {
         double y = 1 - (dis(gen) * (1 - std::cos(theta)));
         double z = std::sqrt(1 - (y * y));
