@@ -24,8 +24,6 @@ public:
     
     std::optional<Hit> intersect(const Ray& ray) const override;
 
-    Color color(const std::any&) const override { return color_; }
-
 };
 
 #endif

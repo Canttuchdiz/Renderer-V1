@@ -21,11 +21,9 @@ std::optional<Hit> Renderer::ray_intersect(Ray ray, const Scene& scene) const {
 
 Vector3 Renderer::trace_ray(Ray ray, const Scene& scene, int bounces) const
 {
-
     if (bounces <= 0) return Color(0, 0, 0);
 
     Radiance radiance = Vector3::zero();
-
     std::optional<Hit> last_hit = ray_intersect(ray, scene);
 
     if (last_hit) {
@@ -40,10 +38,8 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene& scene, int bounces) const
 
         Color hit_reflectance = last_hit->material->texture(last_hit->position);
 
-
         Ray sun_ray = Ray(last_hit->position + (last_hit->normal * 0.0001), random_angular_direction);
         if(!(ray_intersect(sun_ray, scene))) {
-
             // Direct lighting
             radiance += 2 * hit_reflectance * source_.radiance() * (1 - std::cos(source_.angular_radius())) * std::max(0.0, last_hit->normal.normalize().dot(sun_ray.direction()));
             
@@ -74,10 +70,8 @@ void Renderer::render(std::ostream &out, const Scene &scene) const
             std::vector<Color> hit_colors;
             for (int k = 0; k < ray_count_; k++)
             {
-
                 Point3 pixel_position = camera_.pixel_random(i, j);
                 Vector3 ray_direction = (pixel_position - camera_.position()).normalize();
-
                 Ray ray = Ray(camera_.position(), ray_direction);
                 
                 Color pixel_color = trace_ray(ray, scene, 5);

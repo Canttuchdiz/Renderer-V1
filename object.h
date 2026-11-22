@@ -16,7 +16,6 @@ public:
 
     virtual std::optional<Hit> intersect(const Ray& ray) const = 0;
     virtual ~Object() = default;
-    virtual Color color(const std::any& data) const = 0;
     const Material& material() const { return *material_; }
 };
 

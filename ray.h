@@ -21,7 +21,7 @@ public:
     Ray(const Point3& origin, const Vector3& direction) : origin_{origin}, direction_{direction} {}
 
     const Point3& origin() const { return origin_; }
-    const Vector3& direction() const { return direction_; }
+    const Vector3 direction() const { return direction_.normalize(); }
 
     Point3 at(double t) const { return origin_ + (t * direction_); }
 };
