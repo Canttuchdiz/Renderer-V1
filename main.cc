@@ -29,7 +29,9 @@ int main() {
 
     Sphere sphere(Vector3(-10, 8, 55), 8, std::make_shared<SphereMaterial>(Vector3(0.3, 0.1, 0.7)));
     Sphere sphere2(Vector3(13, 13, 40), 13, std::make_shared<SphereMaterial>(Vector3(0.9, 0.1, 0.1)));
-    Cube cube(Vector3(-20, 4, 40), 8, std::make_shared<CubeMaterial>(Vector3(0, 0.5, 1)));
+    Cube cube(Vector3(-20, 4, 35), 8, std::make_shared<CubeMaterial>(Vector3(0, 0.5, 1)));
+
+    cube.rotate_y(10);
 
     scene.add_object(std::make_unique<Sphere>(sphere));
     scene.add_object(std::make_unique<Sphere>(sphere2));

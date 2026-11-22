@@ -35,6 +35,23 @@ public:
         }
     }
 
+    void rotate_y(double degrees) {
+        Matrix3 rotation_y_matrix = Vector3::rotation_y_matrix(degrees * (pi / 180.0));
+        for (auto& edge : edges_) {
+
+            Point3 rotated_position = (rotation_y_matrix * (edge.position - center_)) + center_;
+            Vector3 rotated_normal = rotation_y_matrix * edge.normal;
+            Vector3 rotated_up = rotation_y_matrix * edge.up;
+
+            edge.position = rotated_position;
+            edge.normal = rotated_normal.normalize();
+            edge.up = rotated_up.normalize();
+
+        }
+    }
+
+    const std::vector<Edge>& edges() const { return edges_; }
+
     std::optional<Hit> intersect(const Ray& ray) const {
         std::optional<Edge> last_edge;
         Vector3 hit_vector;
