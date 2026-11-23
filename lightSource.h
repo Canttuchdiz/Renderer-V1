@@ -16,7 +16,7 @@ public:
                                                                                              angular_radius_{angular_radius},
                                                                                              irradiance_{irradiance} {}
 
-    const Vector3 &direction() const;
+    Vector3 direction() const;
     double angular_radius() const;
     Radiance radiance() const;
 };

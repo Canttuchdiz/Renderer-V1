@@ -14,6 +14,8 @@ private:
     LightSource source_;
     int ray_count_;
 
+    static constexpr int MAX_BOUNCES = 10;
+
 public:
 
     Renderer(int image_width, int image_height, Camera& camera, const LightSource& source, int ray_count);

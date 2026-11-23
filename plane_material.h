@@ -3,12 +3,12 @@
 
 #include <any>
 
-#include "material.h"
+#include "matte_material.h"
 
-class PlaneMaterial : public Material {
+class PlaneMaterial : public MatteMaterial {
 public:
 
-    explicit PlaneMaterial(const Vector3& reflectance) : Material(reflectance) {}
+    explicit PlaneMaterial(const Vector3& reflectance) : MatteMaterial(reflectance) {}
 
     Color texture(const std::any& position_package) const override {
         int square_length = 20;

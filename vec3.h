@@ -160,6 +160,8 @@ public:
 
     static Vector3 zero() { return Vector3(0, 0, 0); }
 
+    static Vector3 one() { return Vector3(1, 1, 1); }
+
     static Vector3 forward() { return Vector3(0, 0, 1); }
 
     static Vector3 up() { return Vector3(0, 1, 0); }
