@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "renderer.h"
 #include "color.h"
 #include "sphere.h"
@@ -56,7 +57,6 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
             Vector3 bounce_direction = reflection_sample.direction;
             if (bounce_direction.dot(source_.direction()) >= std::cos(source_.angular_radius()) && !ray_intersect(Ray(last_hit->position + (last_hit->normal * 0.0001), bounce_direction), scene))
                 radiance += reflection_sample.weight * source_.radiance();
-
         }
 
         // Indirect lighting
@@ -70,10 +70,13 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 void Renderer::render(std::ostream &out, const Scene &scene) const
 {
 
+    const auto start_time = std::chrono::steady_clock::now();
+
     out << "P3\n"
         << image_width_ << ' ' << image_height_ << "\n255\n";
 
     int last_percent = 0;
+    const auto total_pixels = 1LL * image_width_ * image_height_;
 
     for (int j = 0; j < image_height_; j++)
     {
@@ -100,12 +103,27 @@ void Renderer::render(std::ostream &out, const Scene &scene) const
             Color pixel_root_average = Color(std::sqrt(mapped_pixel_average.x()), std::sqrt(mapped_pixel_average.y()), std::sqrt(mapped_pixel_average.z()));
             write_color(out, pixel_root_average);
 
-            int percent = int((double(i + 1 + (j * image_width_)) / (image_width_ * image_height_)) * 100);
+            const auto pixels_done = 1LL * j * image_width_ + i + 1;
+            const int percent = static_cast<int>(100.0 * pixels_done / total_pixels);
 
             if (percent > last_percent)
             {
                 last_percent = percent;
-                std::clog << "\rRendering: " << percent << "%" << std::flush;
+
+                const double elapsed = std::chrono::duration<double>(
+                                           std::chrono::steady_clock::now() - start_time)
+                                           .count();
+
+                const auto elapsed_seconds = static_cast<long long>(elapsed);
+                const auto remaining_seconds = static_cast<long long>(
+                    (elapsed / pixels_done) * (total_pixels - pixels_done));
+
+                std::clog << "\rRendering: " << percent << "%"
+                          << " | Elapsed: " << elapsed_seconds / 60 << ':'
+                          << (elapsed_seconds % 60 < 10 ? "0" : "") << elapsed_seconds % 60
+                          << " | Remaining: " << remaining_seconds / 60 << ':'
+                          << (remaining_seconds % 60 < 10 ? "0" : "") << remaining_seconds % 60
+                          << "    " << std::flush;
             }
         }
     }
