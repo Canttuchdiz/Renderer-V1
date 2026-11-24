@@ -62,11 +62,19 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
         // Indirect lighting
         radiance += reflection_sample.weight * trace_ray(Ray(last_hit->position + (last_hit->normal * 0.0001), reflection_sample.direction), scene, bounces - 1);
     }
-    // else if (bounces == MAX_BOUNCES) radiance += source_.radiance();
+    else if (ray.direction().dot(Vector3::up()) > 0) {
+        double distance_scalar = ray.direction().dot(Vector3::up());
+        Color far_blue = Color(260.0, 440.0, 570.0);
+        Color close_blue = Vector3(10.0, 100.0, 570.0);
+        Color interpolator = close_blue - far_blue;
+
+        radiance += far_blue + interpolator * distance_scalar;
+    }
 
     return radiance;
 }
 
+// Rewrite to use image buffer
 void Renderer::render(std::ostream &out, const Scene &scene) const
 {
 

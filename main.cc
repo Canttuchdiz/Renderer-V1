@@ -13,9 +13,9 @@
 #include "mirror_material.h"
 
 int main() {
-    // 1280 720 | 850 478
-    int image_width = 1280;
-    int image_height = 720;
+    // 2560 1440 | 1280 720 | 850 478
+    int image_width = 850;
+    int image_height = 478;
     double fov = 100;
 
     std::ofstream output("image.ppm");
@@ -38,8 +38,9 @@ int main() {
     scene.add_object(std::make_unique<Sphere>(sphere2));
     scene.add_object(std::make_unique<Cube>(cube));
     scene.add_object(std::make_unique<Plane>(0, std::make_shared<PlaneMaterial>(Vector3(0.3, 0.3, 0.3))));
+    // scene.add_object(std::make_unique<Plane>(0, std::make_shared<MirrorMaterial>(Vector3::one() * 0.95)));
 
-    Renderer renderer = Renderer(image_width, image_height, camera, source, 2048); // 64 | 2048
+    Renderer renderer = Renderer(image_width, image_height, camera, source, 64); // 64 | 2048 | 4096
 
     renderer.render(output, scene);
 }
