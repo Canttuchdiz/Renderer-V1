@@ -77,8 +77,9 @@ Vector3 Renderer::trace_ray(Ray ray, const Scene &scene, int bounces) const
 // Rewrite to use image buffer
 void Renderer::render(std::ostream &out, const Scene &scene) const
 {
-
     const auto start_time = std::chrono::steady_clock::now();
+
+    Vector3 display_buffer[image_height_][image_width_];
 
     out << "P3\n"
         << image_width_ << ' ' << image_height_ << "\n255\n";
@@ -108,7 +109,10 @@ void Renderer::render(std::ostream &out, const Scene &scene) const
             Color pixel_average = pixel_sum / hit_colors.size();
             Color exposed = pixel_average * .0028;
             Color mapped_pixel_average = Vector3(exposed.x() / (exposed.x() + 1), exposed.y() / (exposed.y() + 1), exposed.z() / (exposed.z() + 1));
+            
             Color pixel_root_average = Color(std::sqrt(mapped_pixel_average.x()), std::sqrt(mapped_pixel_average.y()), std::sqrt(mapped_pixel_average.z()));
+            display_buffer[j][i] = pixel_root_average;
+
             write_color(out, pixel_root_average);
 
             const auto pixels_done = 1LL * j * image_width_ + i + 1;
